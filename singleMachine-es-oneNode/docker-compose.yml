@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  es-slave2:
+    image: elasticsearch:6.8.12
+    container_name: es-slave2
+    environment:      
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      #- cluster.name=docker-cluster
+      #- "discovery.zen.ping.unicast.hosts=192.168.137.54:9200"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - es-slave2-datas:/usr/share/elasticsearch/data
+      - es-slave2-logs:/usr/share/elasticsearch/logs
+      - es-slave2-cofig:/usr/share/elasticsearch/config
+    networks:
+      - esnet
+
+volumes:
+  es-slave2-datas:
+    name: es-slave2-datas
+  es-slave2-logs:
+    name: es-slave2-logs
+  es-slave2-cofig:
+    name: es-slave2-cofig
+
+networks:
+  esnet:
+    name: esnet
