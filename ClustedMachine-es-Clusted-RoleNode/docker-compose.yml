@@ -2,7 +2,34 @@ version: '3.8'
 services:
   es-master:
     image: elasticsearch:6.8.12
-    container_name: es-master    
+    container_name: es-master
+    network_mode: 'host'
+    environment:
+      cluster.name: 'docker-cluster'
+      bootstrap.memory_lock: 'true'
+      ES_JAVA_OPTS: '-Xms1g -Xmx1g'
+      node.name: 'es-master'
+      node.master: 'true'
+      node.data: 'false'
+      node.ingest: 'false'
+      node.ml: 'false'
+      discovery.zen.minimum_master_nodes: 1
+      network.host: '192.168.137.54'
+      #indices.fielddata.cache.size: '25%'
+      #path.data: '数据存储路径' 默认
+      #path.logs: ''
+      #http.port: 9200默认
+      #transport.tcp.port: 9300默认
+      #network.host: '0.0.0.0'  默认就是0.0.0.0 不确定能否外网物理ip非host模式
+      # network.bind_host: 0.0.0.0    这两个参数和上面的host是同样效果
+      # network.publish_host: 172.17.3.99   这个是否可以保留外网物理ip
+      #node.attr.rack: '备注'
+      #discovery.zen.ping.unicast.hosts: '发现主机,隔开'
+      #gateway.recover_after_nodes: 1 多数节点才开始实现恢复
+      # http.cors.enabled: true  heap等插件需要打开跨域
+      # http.cors.allow-origin: "*"
+      #indices.query.bool.max_clause_count: 10000  貌似没有说明   应该是索引的计算信息等
+
     ulimits:
       memlock:
         soft: -1
@@ -10,15 +37,31 @@ services:
     volumes:
       - es-master-datas:/usr/share/elasticsearch/data
       - es-master-logs:/usr/share/elasticsearch/logs
-      - es-master-config:/usr/share/elasticsearch/config      
+      - es-master-config:/usr/share/elasticsearch/config    
+      - /etc/localtime:/etc/localtime
     ports:
       - 9200:9200
       - 9300:9300
-    networks:
-      - esnet
+    # networks:
+      # - esnet
   es-slave1:
     image: elasticsearch:6.8.12
     container_name: es-slave1
+    network_mode: 'host'
+    environment:
+      cluster.name: 'docker-cluster'
+      bootstrap.memory_lock: 'true'
+      ES_JAVA_OPTS: '-Xms2g -Xmx2g'
+      node.name: 'es-slave1'
+      node.master: 'false'
+      node.data: 'false'
+      node.ingest: 'false'
+      node.ml: 'false'
+      discovery.zen.minimum_master_nodes: 1
+      discovery.zen.ping.unicast.hosts: '192.168.137.54:9200,192.168.137.54:9300'
+      network.host: '192.168.137.54'
+      http.port: 9201
+      transport.tcp.port: 9301 
     ulimits:
       memlock:
         soft: -1
@@ -27,23 +70,59 @@ services:
       - es-slave1-datas:/usr/share/elasticsearch/data
       - es-slave1-logs:/usr/share/elasticsearch/logs
       - es-slave1-config:/usr/share/elasticsearch/config
-    networks:
-      - esnet
+      - /etc/localtime:/etc/localtime
+    # networks:
+      # - esnet
+  es-data1:
+    image: elasticsearch:6.8.12
+    container_name: es-data1
+    network_mode: 'host'
+    environment:
+      cluster.name: 'docker-cluster'
+      bootstrap.memory_lock: 'true'
+      ES_JAVA_OPTS: '-Xms1g -Xmx1g'
+      node.name: 'es-data1'
+      node.master: 'false'
+      node.data: 'true'
+      node.ingest: 'false'
+      node.ml: 'false'
+      discovery.zen.minimum_master_nodes: 1
+      discovery.zen.ping.unicast.hosts: '192.168.137.54:9200,192.168.137.54:9300'
+      http.port: 9202
+      transport.tcp.port: 9302 
+      network.host: '192.168.137.54'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es-data1-datas:/usr/share/elasticsearch/data
+      - es-data1-logs:/usr/share/elasticsearch/logs
+      - es-data1-config:/usr/share/elasticsearch/config
+      - /etc/localtime:/etc/localtime
+    # networks:
+      # - esnet
 
 volumes:
   es-master-datas:
     name: es-master-datas
   es-slave1-datas:
     name: es-slave1-datas
+  es-data1-datas:
+    name: es-data1-datas
   es-master-logs:
     name: es-master-logs
   es-slave1-logs:
     name: es-slave1-logs
+  es-data1-logs:
+    name: es-data1-logs
   es-master-config:
     name: es-master-config
   es-slave1-config:
     name: es-slave1-config
+  es-data1-config:
+    name: es-data1-config
 
-networks:
-  esnet:
-    name: esnet
+# networks:
+  # esnet:
+    # name: esnet

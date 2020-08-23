@@ -3,11 +3,33 @@ services:
   es-slave2:
     image: elasticsearch:6.8.12
     container_name: es-slave2
+    network_mode: 'host'
     environment:      
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      #- cluster.name=docker-cluster
-      #- "discovery.zen.ping.unicast.hosts=192.168.137.54:9200"
+      cluster.name: 'docker-cluster'
+      bootstrap.memory_lock: 'true'
+      ES_JAVA_OPTS: '-Xms1g -Xmx1g'
+      node.name: 'es-slav2'
+      node.master: 'false'
+      node.data: 'false'
+      node.ingest: 'false'
+      node.ml: 'false'
+      discovery.zen.minimum_master_nodes: 1      
+      discovery.zen.ping.unicast.hosts: '192.168.137.54:9200,192.168.137.54:9300'
+      network.host: '192.168.137.53'  
+      #network.host: '0.0.0.0'  默认就是0.0.0.0 不确定能否外网物理ip非host模式
+      #discovery.zen.ping.unicast.hosts: '发现主机,隔开'
+      #indices.fielddata.cache.size: '25%'
+      #path.data: '数据存储路径' 默认
+      #path.logs: ''
+      #http.port: 9200默认
+      #transport.tcp.port: 9300默认      
+      # network.bind_host: 0.0.0.0    这两个参数和上面的host是同样效果
+      # network.publish_host: 172.17.3.99   这个是否可以保留外网物理ip
+      #node.attr.rack: '备注'      
+      #gateway.recover_after_nodes: 1 多数节点才开始实现恢复
+      # http.cors.enabled: true  heap等插件需要打开跨域
+      # http.cors.allow-origin: "*"
+      #indices.query.bool.max_clause_count: 10000  貌似没有说明   应该是索引的计算信息等
     ulimits:
       memlock:
         soft: -1
@@ -19,8 +41,9 @@ services:
       - es-slave2-datas:/usr/share/elasticsearch/data
       - es-slave2-logs:/usr/share/elasticsearch/logs
       - es-slave2-cofig:/usr/share/elasticsearch/config
-    networks:
-      - esnet
+      - /etc/localtime:/etc/localtime
+    # networks:
+      # - esnet
 
 volumes:
   es-slave2-datas:
@@ -30,6 +53,6 @@ volumes:
   es-slave2-cofig:
     name: es-slave2-cofig
 
-networks:
-  esnet:
-    name: esnet
+# networks:
+  # esnet:
+    # name: esnet
