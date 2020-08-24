@@ -16,7 +16,7 @@ services:
       discovery.zen.minimum_master_nodes: 1      
       discovery.zen.ping.unicast.hosts: '192.168.137.54:9201,192.168.137.54:9301'
       network.host: '192.168.137.53'  
-      #path.data: '/usr/share/elasticsearch/data/01,/usr/share/elasticsearch/data/02,/usr/share/elasticsearch/data/03,/usr/share/elasticsearch/data/04,/usr/share/elasticsearch/data/05,/usr/share/elasticsearch/data/06,/usr/share/elasticsearch/data/07,/usr/share/elasticsearch/data/08,/usr/share/elasticsearch/data/09,/usr/share/elasticsearch/data/10,/usr/share/elasticsearch/data/11,/usr/share/elasticsearch/data/012'
+      path.data: '/usr/share/elasticsearch/data/01,/usr/share/elasticsearch/data/02,/usr/share/elasticsearch/data/03,/usr/share/elasticsearch/data/04,/usr/share/elasticsearch/data/05,/usr/share/elasticsearch/data/06,/usr/share/elasticsearch/data/07,/usr/share/elasticsearch/data/08,/usr/share/elasticsearch/data/09,/usr/share/elasticsearch/data/10,/usr/share/elasticsearch/data/11,/usr/share/elasticsearch/data/012'
       http.enabled: 'false'
       #network.host: '0.0.0.0'  默认就是0.0.0.0 不确定能否外网物理ip非host模式
       #discovery.zen.ping.unicast.hosts: '发现主机,隔开'
