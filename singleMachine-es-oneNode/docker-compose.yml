@@ -1,25 +1,29 @@
 version: '3.8'
 services:
-  es-slave2:
+  es-data2:
     image: elasticsearch:6.8.12
-    container_name: es-slave2
+    container_name: es-data2
     network_mode: 'host'
     environment:      
       cluster.name: 'docker-cluster'
       bootstrap.memory_lock: 'true'
       ES_JAVA_OPTS: '-Xms1g -Xmx1g'
-      node.name: 'es-slav2'
+      node.name: 'es-data2'
       node.master: 'false'
-      node.data: 'false'
+      node.data: 'true'
       node.ingest: 'false'
       node.ml: 'false'
       discovery.zen.minimum_master_nodes: 1      
-      discovery.zen.ping.unicast.hosts: '192.168.137.54:9200,192.168.137.54:9300'
+      discovery.zen.ping.unicast.hosts: '192.168.137.54:9201,192.168.137.54:9301'
       network.host: '192.168.137.53'  
+      #path.data: '/usr/share/elasticsearch/data/01,/usr/share/elasticsearch/data/02,/usr/share/elasticsearch/data/03,/usr/share/elasticsearch/data/04,/usr/share/elasticsearch/data/05,/usr/share/elasticsearch/data/06,/usr/share/elasticsearch/data/07,/usr/share/elasticsearch/data/08,/usr/share/elasticsearch/data/09,/usr/share/elasticsearch/data/10,/usr/share/elasticsearch/data/11,/usr/share/elasticsearch/data/012'
+      http.enabled: 'false'
       #network.host: '0.0.0.0'  默认就是0.0.0.0 不确定能否外网物理ip非host模式
       #discovery.zen.ping.unicast.hosts: '发现主机,隔开'
       #indices.fielddata.cache.size: '25%'
       #path.data: '数据存储路径' 默认
+      #path.data: /data/01,/data/02     # 如果在path.data中写多个目录用“，”分隔，功能类似于raid 0，而不是做备份
+      #cluster.routing.allocation.same_shard.host: true
       #path.logs: ''
       #http.port: 9200默认
       #transport.tcp.port: 9300默认      
@@ -38,20 +42,20 @@ services:
       - 9200:9200
       - 9300:9300
     volumes:
-      - es-slave2-datas:/usr/share/elasticsearch/data
-      - es-slave2-logs:/usr/share/elasticsearch/logs
-      - es-slave2-cofig:/usr/share/elasticsearch/config
+      - es-data2-datas:/usr/share/elasticsearch/data
+      - es-data2-logs:/usr/share/elasticsearch/logs
+      - es-data2-cofig:/usr/share/elasticsearch/config
       - /etc/localtime:/etc/localtime
     # networks:
       # - esnet
 
 volumes:
-  es-slave2-datas:
-    name: es-slave2-datas
-  es-slave2-logs:
-    name: es-slave2-logs
-  es-slave2-cofig:
-    name: es-slave2-cofig
+  es-data2-datas:
+    name: es-data2-datas
+  es-data2-logs:
+    name: es-data2-logs
+  es-data2-cofig:
+    name: es-data2-cofig
 
 # networks:
   # esnet:

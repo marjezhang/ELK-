@@ -15,21 +15,33 @@ services:
       node.ml: 'false'
       discovery.zen.minimum_master_nodes: 1
       network.host: '192.168.137.54'
+      http.port: 9201
+      transport.tcp.port: 9301
+      #discovery.zen.ping.unicast.hosts: '192.168.137.54:9201,192.168.137.54:9301'
+      #discovery.zen.minimum_master_nodes: 2 master最小的选举节点数量
+      #node.ingest: 'false'  logstash功能重叠
       #indices.fielddata.cache.size: '25%'
       #path.data: '数据存储路径' 默认
       #path.logs: ''
       #http.port: 9200默认
       #transport.tcp.port: 9300默认
       #network.host: '0.0.0.0'  默认就是0.0.0.0 不确定能否外网物理ip非host模式
-      # network.bind_host: 0.0.0.0    这两个参数和上面的host是同样效果
-      # network.publish_host: 172.17.3.99   这个是否可以保留外网物理ip
+      #network.bind_host: 0.0.0.0    这两个参数和上面的host是同样效果
+      #network.publish_host: 172.17.3.99   这个是否可以保留外网物理ip
       #node.attr.rack: '备注'
       #discovery.zen.ping.unicast.hosts: '发现主机,隔开'
       #gateway.recover_after_nodes: 1 多数节点才开始实现恢复
-      # http.cors.enabled: true  heap等插件需要打开跨域
-      # http.cors.allow-origin: "*"
+      #http.cors.enabled: true  heap等插件需要打开跨域
+      #http.cors.allow-origin: "*"
       #indices.query.bool.max_clause_count: 10000  貌似没有说明   应该是索引的计算信息等
-
+      #path.data: /data/01,/data/02     # 如果在path.data中写多个目录用“，”分隔，功能类似于raid 0，而不是做备份
+      #cluster.routing.allocation.same_shard.host: true
+      # 发现的时间优化
+      # discovery.zen.ping_timeout: 200s
+      # discovery.zen.fd.ping_timeout: 200s
+      # discovery.zen.fd.ping_interval: 30s
+      # discovery.zen.fd.ping_retries: 5
+      # bootstrap.system_call_filter: false
     ulimits:
       memlock:
         soft: -1
@@ -39,11 +51,12 @@ services:
       - es-master-logs:/usr/share/elasticsearch/logs
       - es-master-config:/usr/share/elasticsearch/config    
       - /etc/localtime:/etc/localtime
-    ports:
-      - 9200:9200
-      - 9300:9300
+    # ports:
+      # - 9200:9201
+      # - 9300:9301
     # networks:
       # - esnet
+    #暴露的是slave协调节点
   es-slave1:
     image: elasticsearch:6.8.12
     container_name: es-slave1
@@ -58,10 +71,10 @@ services:
       node.ingest: 'false'
       node.ml: 'false'
       discovery.zen.minimum_master_nodes: 1
-      discovery.zen.ping.unicast.hosts: '192.168.137.54:9200,192.168.137.54:9300'
+      discovery.zen.ping.unicast.hosts: '192.168.137.54:9201,192.168.137.54:9301'
       network.host: '192.168.137.54'
-      http.port: 9201
-      transport.tcp.port: 9301 
+      http.port: 9200
+      transport.tcp.port: 9300 
     ulimits:
       memlock:
         soft: -1
@@ -87,10 +100,12 @@ services:
       node.ingest: 'false'
       node.ml: 'false'
       discovery.zen.minimum_master_nodes: 1
-      discovery.zen.ping.unicast.hosts: '192.168.137.54:9200,192.168.137.54:9300'
+      discovery.zen.ping.unicast.hosts: '192.168.137.54:9201,192.168.137.54:9301'
       http.port: 9202
       transport.tcp.port: 9302 
+      http.enabled: 'false'
       network.host: '192.168.137.54'
+      path.data: '/usr/share/elasticsearch/data/01,/usr/share/elasticsearch/data/02,/usr/share/elasticsearch/data/03,/usr/share/elasticsearch/data/04,/usr/share/elasticsearch/data/05,/usr/share/elasticsearch/data/06,/usr/share/elasticsearch/data/07,/usr/share/elasticsearch/data/08,/usr/share/elasticsearch/data/09,/usr/share/elasticsearch/data/10,/usr/share/elasticsearch/data/11,/usr/share/elasticsearch/data/012'
     ulimits:
       memlock:
         soft: -1
