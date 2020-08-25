@@ -4,6 +4,7 @@ services:
     image: elasticsearch:6.8.12
     container_name: es-master
     network_mode: 'host'
+    restart: always
     environment:
       cluster.name: 'docker-cluster'
       bootstrap.memory_lock: 'true'
@@ -61,6 +62,7 @@ services:
     image: elasticsearch:6.8.12
     container_name: es-slave1
     network_mode: 'host'
+    restart: always
     environment:
       cluster.name: 'docker-cluster'
       bootstrap.memory_lock: 'true'
@@ -90,6 +92,7 @@ services:
     image: elasticsearch:6.8.12
     container_name: es-data1
     network_mode: 'host'
+    restart: always
     environment:
       cluster.name: 'docker-cluster'
       bootstrap.memory_lock: 'true'

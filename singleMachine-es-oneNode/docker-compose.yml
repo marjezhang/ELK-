@@ -4,6 +4,7 @@ services:
     image: elasticsearch:6.8.12
     container_name: es-data2
     network_mode: 'host'
+    restart: always
     environment:      
       cluster.name: 'docker-cluster'
       bootstrap.memory_lock: 'true'
@@ -48,6 +49,15 @@ services:
       - /etc/localtime:/etc/localtime
     # networks:
       # - esnet
+
+  es-opt-cerebro:
+    image: lmenezes/cerebro
+    container_name: es-opt-cerebro    
+    restart: always
+    environment:      
+      CEREBRO_PORT: 9100
+    ports:
+      - 9100:9100    
 
 volumes:
   es-data2-datas:
