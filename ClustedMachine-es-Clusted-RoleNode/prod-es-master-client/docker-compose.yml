@@ -100,14 +100,14 @@ services:
       - /etc/localtime:/etc/localtime
     # ports:
       # - 5601:5601      
-    # deploy:
-      # resources:
-        # limits:
-          # cpus: '1'
-          # memory: 2g
-        # reservations:
-          # cpus: '0.01'
-          # memory: 2g  
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2g
+        reservations:
+          cpus: '0.01'
+          memory: 2g  
   nginx-svr:
     image: nginx:stable
     container_name: nginx-svr
