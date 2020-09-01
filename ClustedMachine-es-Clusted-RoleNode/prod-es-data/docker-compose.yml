@@ -1,0 +1,114 @@
+version: '3.8'
+services:
+  es-data1:
+    image: elasticsearch:6.8.12
+    container_name: es-data1
+    network_mode: 'host'
+    restart: always
+    environment:
+      cluster.name: 'docker-cluster'
+      bootstrap.memory_lock: 'true'
+      ES_JAVA_OPTS: '-Xms7g -Xmx7g'
+      node.name: 'es-data1'
+      node.master: 'false'
+      node.data: 'true'
+      node.ingest: 'false'
+      node.ml: 'false'
+      discovery.zen.minimum_master_nodes: 1
+      discovery.zen.ping.unicast.hosts: '192.168.0.11:9201,192.168.0.11:9301'
+      http.port: 9211
+      transport.tcp.port: 9311 
+      http.enabled: 'false'
+      network.host: '192.168.0.33'
+      path.data: '/usr/share/elasticsearch/data/01,/usr/share/elasticsearch/data/02,/usr/share/elasticsearch/data/03,/usr/share/elasticsearch/data/04,/usr/share/elasticsearch/data/05,/usr/share/elasticsearch/data/06,/usr/share/elasticsearch/data/07,/usr/share/elasticsearch/data/08,/usr/share/elasticsearch/data/09,/usr/share/elasticsearch/data/10,/usr/share/elasticsearch/data/11,/usr/share/elasticsearch/data/012'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2g"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 14g
+        reservations:
+          # cpus: '0.01'
+          memory: 14g
+    volumes:
+      - es-data1-datas:/usr/share/elasticsearch/data
+      - es-data1-logs:/usr/share/elasticsearch/logs
+      - es-data1-config:/usr/share/elasticsearch/config
+      - /etc/localtime:/etc/localtime
+  es-data2:
+    image: elasticsearch:6.8.12
+    container_name: es-data2
+    network_mode: 'host'
+    restart: always
+    environment:
+      cluster.name: 'docker-cluster'
+      bootstrap.memory_lock: 'true'
+      ES_JAVA_OPTS: '-Xms7g -Xmx7g'
+      node.name: 'es-data2'
+      node.master: 'false'
+      node.data: 'true'
+      node.ingest: 'false'
+      node.ml: 'false'
+      discovery.zen.minimum_master_nodes: 1
+      discovery.zen.ping.unicast.hosts: '192.168.0.11:9201,192.168.0.11:9301'
+      http.port: 9212
+      transport.tcp.port: 9312 
+      http.enabled: 'false'
+      network.host: '192.168.0.33'
+      path.data: '/usr/share/elasticsearch/data/01,/usr/share/elasticsearch/data/02,/usr/share/elasticsearch/data/03,/usr/share/elasticsearch/data/04,/usr/share/elasticsearch/data/05,/usr/share/elasticsearch/data/06,/usr/share/elasticsearch/data/07,/usr/share/elasticsearch/data/08,/usr/share/elasticsearch/data/09,/usr/share/elasticsearch/data/10,/usr/share/elasticsearch/data/11,/usr/share/elasticsearch/data/012'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2g"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 14g
+        reservations:
+          # cpus: '0.01'
+          memory: 14g
+    volumes:
+      - es-data2-datas:/usr/share/elasticsearch/data
+      - es-data2-logs:/usr/share/elasticsearch/logs
+      - es-data2-config:/usr/share/elasticsearch/config
+      - /etc/localtime:/etc/localtime
+      
+  es-opt-cerebro:
+    image: lmenezes/cerebro
+    container_name: es-opt-cerebro    
+    restart: always
+    environment:      
+      CEREBRO_PORT: 9100
+    ports:
+      - 9100:9100
+ 
+
+volumes:
+  es-data1-datas:
+    name: es-data1-datas
+  es-data1-logs:
+    name: es-data1-logs
+  es-data1-config:
+    name: es-data1-config
+  es-data2-datas:
+    name: es-data2-datas
+  es-data2-logs:
+    name: es-data2-logs
+  es-data2-config:
+    name: es-data2-config
+
+

@@ -1,0 +1,151 @@
+version: '3.8'
+services:
+  es-master:
+    image: elasticsearch:6.8.12
+    container_name: es-master
+    network_mode: 'host'
+    restart: always
+    environment:
+      cluster.name: 'docker-cluster'
+      bootstrap.memory_lock: 'true'
+      ES_JAVA_OPTS: '-Xms2g -Xmx2g'
+      node.name: 'es-master'
+      node.master: 'true'
+      node.data: 'false'
+      node.ingest: 'false'
+      node.ml: 'false'
+      discovery.zen.minimum_master_nodes: 1      
+      http.port: 9201
+      transport.tcp.port: 9301 
+      network.host: '192.168.0.11'     
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2g"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4g
+        reservations:
+          #cpus: '0.01'
+          memory: 4g
+    volumes:
+      - es-master-datas:/usr/share/elasticsearch/data
+      - es-master-logs:/usr/share/elasticsearch/logs
+      - es-master-config:/usr/share/elasticsearch/config
+      - /etc/localtime:/etc/localtime
+  es-client:
+    image: elasticsearch:6.8.12
+    container_name: es-client
+    network_mode: 'host'
+    restart: always
+    environment:
+      cluster.name: 'docker-cluster'
+      bootstrap.memory_lock: 'true'
+      ES_JAVA_OPTS: '-Xms3g -Xmx3g'
+      node.name: 'es-client'
+      node.master: 'false'
+      node.data: 'false'
+      node.ingest: 'false'
+      node.ml: 'false'
+      discovery.zen.minimum_master_nodes: 1
+      discovery.zen.ping.unicast.hosts: '192.168.0.11:9201,192.168.0.11:9301'
+      http.port: 9200
+      transport.tcp.port: 9300       
+      network.host: '192.168.0.11'      
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2g"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 6g
+        reservations:
+          # cpus: '0.01'
+          memory: 6g
+    volumes:
+      - es-client-datas:/usr/share/elasticsearch/data
+      - es-client-logs:/usr/share/elasticsearch/logs
+      - es-client-config:/usr/share/elasticsearch/config
+      - /etc/localtime:/etc/localtime
+  kibana-svr:
+    image: kibana:6.8.12
+    container_name: kibana-svr    
+    restart: always
+    environment:
+      ELASTICSEARCH_HOSTS: 'http://192.168.0.11:9200'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1g"
+        max-file: "3"
+    networks:
+      es-internal-network:
+        aliases:
+          - kibana-svr
+    volumes:
+      - /etc/localtime:/etc/localtime
+    # ports:
+      # - 5601:5601      
+    # deploy:
+      # resources:
+        # limits:
+          # cpus: '1'
+          # memory: 2g
+        # reservations:
+          # cpus: '0.01'
+          # memory: 2g  
+  nginx-svr:
+    image: nginx:stable
+    container_name: nginx-svr
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1g"
+        max-file: "2"
+    networks:
+      es-internal-network:
+        aliases:
+          - nginx-svr
+    ports:
+      - 8080:80
+    volumes:
+      - nginx-etc:/etc/nginx      
+      - /etc/localtime:/etc/localtime
+    
+
+volumes:
+  es-master-datas:
+    name: es-master-datas
+  es-master-logs:
+    name: es-master-logs
+  es-master-config:
+    name: es-master-config
+  es-client-datas:
+    name: es-client-datas
+  es-client-logs:
+    name: es-client-logs
+  es-client-config:
+    name: es-client-config
+  nginx-etc:
+    name: nginx-etc
+
+networks:
+  es-internal-network:
+    name: es-internal-network
+
+
