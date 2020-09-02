@@ -123,6 +123,7 @@ services:
           - nginx-svr
     ports:
       - 8080:80
+      - 9100:9100
     volumes:
       - nginx-etc:/etc/nginx      
       - /etc/localtime:/etc/localtime
